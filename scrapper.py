@@ -30,9 +30,7 @@ class Medal:
 
     @classmethod
     def from_cell(cls, cell, metal):
-        if len(cell.contents) == 0:
-            return None
-        return cls(
+        return None if len(cell.contents) == 0 else cls(
             winner=cell.find_all('a', href=True)[0].find(text=True),
             country=cell.findAll('img')[0].get('title'),
             metal=metal,
@@ -85,7 +83,8 @@ class Sport:
                                      self.olympic.year,
                                      self.identifier))
         table = html.find('table', attrs={'id': 'medals'})
-        return [Event.from_row(r) for r in table.find('tbody').find_all('tr')]
+        for row in table.find('tbody').find_all('tr'):
+            yield Event.from_row(row)
 
     @classmethod
     def from_row(cls, row, olympic):
@@ -122,7 +121,8 @@ class Olympic:
     def sports(self):
         html = html_from(compose_url(self.season, self.year))
         table = html.find('table', attrs={'id': 'sports'})
-        return [Sport.from_row(r, self) for r in table.find_all('tr')]
+        for row in table.find_all('tr'):
+            yield Sport.from_row(row, self)
 
     @classmethod
     def from_row(cls, row, season):
@@ -144,9 +144,8 @@ class Olympic:
     def load_all(cls, season):
         html = html_from(compose_url(season))
         table = html.find('table', attrs={'id': season.capitalize()})
-        return [
-            cls.from_row(r, season) for r in table.find('tbody').find_all('tr')
-        ]
+        for row in table.find('tbody').find_all('tr'):
+            yield cls.from_row(row, season)
 
     def __repr__(self):
         return "{} - {}, {}".format(self.year, self.country, self.city)
