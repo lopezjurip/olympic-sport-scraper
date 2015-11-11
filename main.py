@@ -41,4 +41,4 @@ if __name__ == '__main__':
                     })
 
     t2 = pd.DataFrame(full_data)
-    t2.to_csv('full_data.csv', encoding='utf-8')
+    t2.to_csv('full_data.csv', encoding='utf-8', sep='\t')
